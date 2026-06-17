@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>For Aparna 💗</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!--
+  ============================================================
+  A BIRTHDAY GIFT, BUILT IN CODE — by Divyansh, for Aparna
+  ============================================================
+  HOW THIS FILE IS ORGANIZED (read this before editing):
+
+  1. <style>          → all visual design (colors, fonts, layout, animation)
+  2. <body>            → the actual page content, section by section
+  3. CONFIG SECTION    → near the bottom of the JS, clearly boxed in stars (★),
+                          this is the ONLY place you should need to touch for:
+                            - your timeline milestones
+                            - your unlock questions & answers
+                            - your love letter text
+                            - your photo captions
+                          Search this file for "EDIT ME" to jump to every
+                          spot you can personalize.
+  4. <script>          → the logic that makes it all work
+
+  You do not need to know how to code to edit this. Just find the
+  "EDIT ME" comments and change the text between the quotes.
+  ============================================================
+-->
+
+<style>
+  /* ============================================================
+     DESIGN TOKENS
+     A "midnight romance" palette: deep ink/plum night sky as the
+     canvas, with warm candlelight gold and soft rose as accents.
+     Feels intimate and premium rather than a generic pink template.
+     ============================================================ */
+  :root{
+    --ink:        #1b1029;   /* deepest background */
+    --plum:       #2a1740;   /* mid background */
+    --plum-soft:  #3a2354;   /* card background */
+    --rose:       #e8a9b0;   /* soft rose accent */
+    --rose-deep:  #d98a98;
+    --gold:       #e3c08a;   /* candlelight gold accent */
+    --gold-soft:  #f0d9ad;
+    --cream:      #f7f1e8;   /* primary light text */
+    --cream-dim:  #cdb8c9;   /* secondary/muted text */
+    --line:       rgba(247,241,232,0.14);
+
+    --serif: 'Cormorant Garamond', 'Georgia', serif;
+    --display: 'Playfair Display', 'Georgia', serif;
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+
+  html{ scroll-behavior:smooth; }
+
+  body{
+    background: var(--ink);
+    color: var(--cream);
+    font-family: var(--sans);
+    overflow-x: hidden;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* subtle film-grain / vignette wash so flat color doesn't look cheap */
+  body::before{
+    content:"";
+    position: fixed; inset:0;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(232,169,176,0.10), transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 100%, rgba(227,192,138,0.08), transparent 60%);
+    pointer-events:none;
+    z-index:0;
+  }
+
+  section{ position:relative; z-index:1; }
+
+  img{ max-width:100%; display:block; }
+
+  ::selection{ background: var(--rose); color: var(--ink); }
+
+  /* respect reduced motion preference */
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  }
+
+  /* ============================================================
+     BACKGROUND AMBIENCE: floating particles canvas
+     ============================================================ */
+  #ambient-canvas{
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* ============================================================
+     MUSIC PLAYER
+     ============================================================ */
+  .music-player{
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    z-index: 50;
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    background: rgba(42,23,64,0.55);
+    border: 1px solid var(--line);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-radius: 999px;
+    padding: 8px 14px 8px 8px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+    transition: transform 0.4s var(--ease);
+  }
+
+  .music-player.is-collapsed .music-label{ display:none; }
+
+  .music-toggle{
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, var(--rose), var(--gold));
+    color: var(--ink);
+    display:flex; align-items:center; justify-content:center;
+    cursor: pointer;
+    font-size: 16px;
+    flex-shrink:0;
+    box-shadow: 0 0 0 0 rgba(232,169,176,0.6);
+    transition: box-shadow 0.6s var(--ease), transform 0.2s var(--ease);
+  }
+
+  .music-toggle.is-playing{
+    animation: pulse-glow 2.4s ease-in-out infinite;
+  }
+
+  @keyframes pulse-glow{
+    0%,100%{ box-shadow: 0 0 0 0 rgba(232,169,176,0.45); }
+    50%{ box-shadow: 0 0 0 8px rgba(232,169,176,0); }
+  }
+
+  .music-toggle:hover{ transform: scale(1.08); }
+  .music-toggle:active{ transform: scale(0.96); }
+
+  .music-label{
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: var(--cream-dim);
+    white-space: nowrap;
+  }
+
+  .volume-row{
+    display:flex; align-items:center; gap:6px;
+  }
+
+  .volume-row input[type="range"]{
+    -webkit-appearance:none;
+    width: 60px;
+    height: 3px;
+    border-radius: 3px;
+    background: var(--line);
+    outline:none;
+  }
+  .volume-row input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width: 12px; height:12px;
+    border-radius:50%;
+    background: var(--gold-soft);
+    cursor:pointer;
+  }
+  .volume-row input[type="range"]::-moz-range-thumb{
+    width: 12px; height:12px;
+    border-radius:50%;
+    background: var(--gold-soft);
+    border:none;
+    cursor:pointer;
+  }
+
+  .music-hint{
+    position: fixed;
+    top: 64px;
+    right: 18px;
+    z-index: 50;
+    font-size: 11.5px;
+    color: var(--cream-dim);
+    background: rgba(27,16,41,0.7);
+    padding: 6px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+    pointer-events:none;
+    max-width: 200px;
+    text-align:right;
+  }
+  .music-hint.visible{ opacity:1; transform:translateY(0); }
+
+  @media (max-width: 480px){
+    .music-player{ top: 12px; right: 12px; padding: 6px 12px 6px 6px; }
+    .volume-row{ display:none; } /* keep mobile bar uncluttered; tap toggles play/pause */
+    .music-hint{ top: 58px; right: 12px; font-size: 11px; max-width: 160px; }
+  }
+
+  /* ============================================================
+     SHARED LAYOUT
+     ============================================================ */
+  .wrap{
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .eyebrow{
+    font-family: var(--sans);
+    font-size: 11.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold-soft);
+    opacity: 0.85;
+    display:block;
+    margin-bottom: 18px;
+  }
+
+  .section-title{
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(28px, 6vw, 42px);
+    line-height: 1.2;
+    color: var(--cream);
+    margin-bottom: 14px;
+  }
+
+  .section-sub{
+    font-family: var(--serif);
+    font-size: clamp(16px, 2.6vw, 19px);
+    color: var(--cream-dim);
+    line-height: 1.65;
+    max-width: 540px;
+  }
+
+  .section-pad{
+    padding: 110px 0;
+  }
+
+  @media (max-width: 600px){
+    .section-pad{ padding: 80px 0; }
+  }
+
+  /* reveal-on-scroll utility */
+  .reveal{
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
+  }
+  .reveal.in-view{
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ============================================================
+     HERO
+     ============================================================ */
+  .hero{
+    min-height: 100vh;
+    min-height: 100dvh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding: 100px 24px 60px;
+    position:relative;
+  }
+
+  .hero-glow{
+    position:absolute;
+    top: 50%; left:50%;
+    width: 600px; height:600px;
+    transform: translate(-50%,-50%);
+    background: radial-gradient(circle, rgba(232,169,176,0.16), transparent 65%);
+    pointer-events:none;
+    z-index:0;
+  }
+
+  .hero-kicker{
+    font-family: var(--sans);
+    font-size: 12px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--rose);
+    margin-bottom: 26px;
+    opacity:0;
+    animation: fade-up 1.1s var(--ease) 0.2s forwards;
+  }
+
+  .hero-title{
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(40px, 11vw, 84px);
+    line-height: 1.05;
+    color: var(--cream);
+    margin-bottom: 22px;
+    opacity:0;
+    animation: fade-up 1.1s var(--ease) 0.45s forwards;
+  }
+
+  .hero-title em{
+    font-style: italic;
+    background: linear-gradient(135deg, var(--gold-soft), var(--rose));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .hero-sub{
+    font-family: var(--serif);
+    font-size: clamp(17px, 3vw, 21px);
+    color: var(--cream-dim);
+    max-width: 460px;
+    line-height: 1.7;
+    margin-bottom: 44px;
+    opacity:0;
+    animation: fade-up 1.1s var(--ease) 0.7s forwards;
+  }
+
+  @keyframes fade-up{
+    from{ opacity:0; transform: translateY(18px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+
+  .hero-cta{
+    opacity:0;
+    animation: fade-up 1.1s var(--ease) 0.95s forwards;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap: 14px;
+  }
+
+  .btn-primary{
+    font-family: var(--sans);
+    font-size: 14px;
+    letter-spacing: 0.05em;
+    color: var(--ink);
+    background: linear-gradient(135deg, var(--gold-soft), var(--rose));
+    border: none;
+    padding: 16px 34px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-weight: 600;
+    box-shadow: 0 10px 30px rgba(232,169,176,0.25);
+    transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease);
+  }
+  .btn-primary:hover{
+    transform: translateY(-3px);
+    box-shadow: 0 14px 36px rgba(232,169,176,0.38);
+  }
+  .btn-primary:active{ transform: translateY(0); }
+
+  .scroll-cue{
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--cream-dim);
+    opacity: 0.6;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:8px;
+  }
+  .scroll-cue .line{
+    width:1px; height:30px;
+    background: linear-gradient(to bottom, var(--cream-dim), transparent);
+    animation: scroll-pulse 2s ease-in-out infinite;
+  }
+  @keyframes scroll-pulse{
+    0%,100%{ opacity:0.3; }
+    50%{ opacity:1; }
+  }
+
+  /* ============================================================
+     TIMELINE
+     ============================================================ */
+  .timeline{
+    position:relative;
+    margin-top: 60px;
+    padding-left: 30px;
+  }
+  .timeline::before{
+    content:"";
+    position:absolute;
+    left: 7px; top:6px; bottom:6px;
+    width:1px;
+    background: linear-gradient(to bottom, var(--rose), var(--gold), transparent);
+  }
+
+  .timeline-item{
+    position:relative;
+    margin-bottom: 52px;
+  }
+  .timeline-item:last-child{ margin-bottom:0; }
+
+  .timeline-dot{
+    position:absolute;
+    left: -30px; top: 4px;
+    width: 14px; height:14px;
+    border-radius:50%;
+    background: var(--ink);
+    border: 2px solid var(--rose);
+    box-shadow: 0 0 0 4px rgba(232,169,176,0.12);
+  }
+
+  .timeline-date{
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold-soft);
+    margin-bottom: 8px;
+    display:block;
+  }
+
+  .timeline-heading{
+    font-family: var(--display);
+    font-size: clamp(20px, 4vw, 25px);
+    color: var(--cream);
+    margin-bottom: 8px;
+  }
+
+  .timeline-text{
+    font-family: var(--serif);
+    font-size: 16.5px;
+    color: var(--cream-dim);
+    line-height: 1.7;
+    max-width: 480px;
+  }
+
+  /* ============================================================
+     GALLERY
+     ============================================================ */
+  .gallery-grid{
+    display:grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+    margin-top: 50px;
+  }
+
+  @media (min-width: 640px){
+    .gallery-grid{ grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  }
+
+  .photo-card{
+    position:relative;
+    border-radius: 18px;
+    overflow:hidden;
+    background: var(--plum-soft);
+    border: 1px solid var(--line);
+    aspect-ratio: 4/5;
+    cursor:pointer;
+    transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease);
+  }
+
+  .photo-card:hover{
+    transform: translateY(-6px);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.4);
+  }
+
+  /*
+    EDIT ME — REPLACING PHOTOS:
+    Each .photo-placeholder div below has a CSS background-image
+    set inline with a tiny built-in heart icon as a stand-in.
+    To use a REAL photo, find the matching <div class="photo-card">
+    in the HTML body and either:
+      a) add an <img src="your-photo.jpg" alt="..."> tag inside it, or
+      b) change the inline style="background-image:url(...)" to your image URL.
+    Full instructions are in the README section at the bottom of this file.
+  */
+  .photo-placeholder{
+    width:100%; height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:
+      linear-gradient(135deg, rgba(232,169,176,0.18), rgba(227,192,138,0.12)),
+      var(--plum-soft);
+    position:relative;
+  }
+
+  .photo-placeholder::before{
+    content:"♡";
+    font-size: 34px;
+    color: rgba(247,241,232,0.25);
+    font-family: var(--display);
+  }
+
+  .photo-placeholder img{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    object-fit:cover;
+  }
+
+  .photo-caption{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    padding: 14px 12px 12px;
+    background: linear-gradient(to top, rgba(27,16,41,0.92), transparent);
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 13.5px;
+    color: var(--cream);
+    text-align:center;
+  }
+
+  /* ============================================================
+     UNLOCK / QUESTIONS SECTION
+     ============================================================ */
+  .lock-card{
+    margin-top: 50px;
+    background: linear-gradient(160deg, var(--plum-soft), var(--plum));
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    padding: 36px 28px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  }
+
+  @media (min-width: 600px){
+    .lock-card{ padding: 48px 44px; }
+  }
+
+  .question-block{
+    margin-bottom: 28px;
+  }
+  .question-block:last-of-type{ margin-bottom: 36px; }
+
+  .question-label{
+    font-family: var(--serif);
+    font-size: 18px;
+    color: var(--cream);
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+
+  .question-number{
+    color: var(--rose);
+    font-family: var(--sans);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    margin-right: 8px;
+  }
+
+  .answer-input{
+    width: 100%;
+    background: rgba(27,16,41,0.5);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-family: var(--sans);
+    font-size: 15px;
+    color: var(--cream);
+    outline:none;
+    transition: border-color 0.3s var(--ease), box-shadow 0.3s var(--ease);
+  }
+  .answer-input::placeholder{ color: rgba(205,184,201,0.45); }
+  .answer-input:focus{
+    border-color: var(--rose);
+    box-shadow: 0 0 0 3px rgba(232,169,176,0.15);
+  }
+  .answer-input.correct{
+    border-color: #9fd8b0;
+  }
+  .answer-input.incorrect{
+    border-color: #e08c8c;
+    animation: shake 0.4s ease;
+  }
+
+  @keyframes shake{
+    0%,100%{ transform: translateX(0); }
+    25%{ transform: translateX(-6px); }
+    75%{ transform: translateX(6px); }
+  }
+
+  .unlock-feedback{
+    font-size: 13px;
+    margin-top: 8px;
+    min-height: 18px;
+    font-family: var(--sans);
+  }
+  .unlock-feedback.success{ color:#9fd8b0; }
+  .unlock-feedback.error{ color:#e08c8c; }
+
+  .unlock-btn{
+    width:100%;
+    font-family: var(--sans);
+    font-size: 14.5px;
+    font-weight:600;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+    background: linear-gradient(135deg, var(--gold-soft), var(--rose));
+    border:none;
+    padding: 16px;
+    border-radius: 14px;
+    cursor:pointer;
+    transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease), opacity 0.3s var(--ease);
+    box-shadow: 0 10px 26px rgba(232,169,176,0.2);
+  }
+  .unlock-btn:hover{ transform: translateY(-2px); }
+  .unlock-btn:disabled{
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform:none;
+  }
+
+  .unlock-status{
+    text-align:center;
+    margin-top: 18px;
+    font-size: 13.5px;
+    color: var(--cream-dim);
+    font-family: var(--serif);
+    font-style: italic;
+  }
+
+  /* ============================================================
+     LOVE LETTER (hidden reveal)
+     ============================================================ */
+  .letter-locked{
+    text-align:center;
+    padding: 70px 24px;
+    border: 1px dashed var(--line);
+    border-radius: 22px;
+    margin-top: 40px;
+  }
+
+  .letter-locked-icon{
+    font-size: 38px;
+    margin-bottom: 18px;
+    opacity: 0.5;
+  }
+
+  .letter-locked-text{
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--cream-dim);
+    font-size: 16px;
+  }
+
+  .letter-reveal{
+    display:none;
+    margin-top: 40px;
+    animation: letter-fade-in 1.4s var(--ease) forwards;
+  }
+
+  .letter-reveal.visible{
+    display:block;
+  }
+
+  @keyframes letter-fade-in{
+    from{ opacity:0; transform: translateY(20px) scale(0.98); filter: blur(6px); }
+    to{ opacity:1; transform: translateY(0) scale(1); filter: blur(0); }
+  }
+
+  .letter-paper{
+    background: linear-gradient(160deg, rgba(247,241,232,0.04), rgba(247,241,232,0.01));
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 44px 28px;
+    position: relative;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+  }
+
+  @media (min-width: 600px){
+    .letter-paper{ padding: 60px 56px; }
+  }
+
+  .letter-paper::before{
+    content:"❀";
+    position:absolute;
+    top: -18px; left:50%;
+    transform: translateX(-50%);
+    font-size: 28px;
+    color: var(--rose);
+    background: var(--ink);
+    padding: 0 12px;
+  }
+
+  .letter-greeting{
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(22px, 5vw, 28px);
+    color: var(--gold-soft);
+    margin-bottom: 24px;
+  }
+
+  /*
+    EDIT ME — YOUR LOVE LETTER TEXT:
+    The actual letter text lives in the HTML body below, inside
+    <div id="letter-body">. Replace the placeholder paragraphs there
+    with your own words. Keep each thought in its own <p> tag.
+  */
+  .letter-body p{
+    font-family: var(--serif);
+    font-size: clamp(16.5px, 2.6vw, 19px);
+    line-height: 1.85;
+    color: var(--cream);
+    margin-bottom: 20px;
+  }
+
+  .letter-signature{
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 22px;
+    color: var(--rose);
+    margin-top: 32px;
+    text-align: right;
+  }
+
+  /* ============================================================
+     CLOSING
+     ============================================================ */
+  .closing{
+    text-align:center;
+    padding: 120px 24px 100px;
+  }
+
+  .closing-heart{
+    font-size: 30px;
+    color: var(--rose);
+    margin-bottom: 24px;
+    display:inline-block;
+    animation: heartbeat 1.8s ease-in-out infinite;
+  }
+
+  @keyframes heartbeat{
+    0%,100%{ transform: scale(1); }
+    50%{ transform: scale(1.15); }
+  }
+
+  .closing-text{
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(22px, 5vw, 30px);
+    color: var(--cream);
+    max-width: 480px;
+    margin: 0 auto 16px;
+    line-height: 1.5;
+  }
+
+  .closing-sub{
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--cream-dim);
+    opacity: 0.6;
+    letter-spacing: 0.05em;
+  }
+
+  /* ============================================================
+     LIGHTBOX (for gallery photos)
+     ============================================================ */
+  .lightbox{
+    position: fixed;
+    inset:0;
+    background: rgba(15,9,22,0.92);
+    backdrop-filter: blur(6px);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index: 100;
+    padding: 24px;
+    opacity:0;
+    transition: opacity 0.35s var(--ease);
+  }
+  .lightbox.visible{ display:flex; opacity:1; }
+
+  .lightbox-content{
+    max-width: 480px;
+    width:100%;
+    background: var(--plum-soft);
+    border-radius: 20px;
+    overflow:hidden;
+    border: 1px solid var(--line);
+  }
+
+  .lightbox-image{
+    width:100%;
+    aspect-ratio: 4/5;
+    background: linear-gradient(135deg, rgba(232,169,176,0.18), rgba(227,192,138,0.12));
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+  }
+  .lightbox-image::before{
+    content:"♡";
+    font-size: 50px;
+    color: rgba(247,241,232,0.25);
+    font-family: var(--display);
+  }
+  .lightbox-image img{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    object-fit:cover;
+  }
+
+  .lightbox-caption{
+    padding: 20px 24px;
+    font-family: var(--serif);
+    font-style:italic;
+    font-size: 16px;
+    text-align:center;
+    color: var(--cream);
+  }
+
+  .lightbox-close{
+    position:absolute;
+    top: 20px; right: 20px;
+    width: 38px; height:38px;
+    border-radius:50%;
+    background: rgba(27,16,41,0.6);
+    border: 1px solid var(--line);
+    color: var(--cream);
+    font-size: 18px;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+</style>
+</head>
+<body>
+
+<!-- floating particles background -->
+<canvas id="ambient-canvas"></canvas>
+
+<!-- ============================================================
+     MUSIC PLAYER UI
+     EDIT ME — YOUR MUSIC FILE:
+     Find the <audio id="bg-music"> tag further down and change
+     its <source src="..."> to your own song file or link.
+     ============================================================ -->
+<div class="music-player is-collapsed" id="music-player">
+  <button class="music-toggle" id="music-toggle" aria-label="Play background music">
+    <span id="music-icon">♪</span>
+  </button>
+  <div class="volume-row">
+    <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.5" aria-label="Volume" />
+  </div>
+</div>
+<div class="music-hint" id="music-hint">tap to play our song</div>
+
+<audio id="bg-music" loop preload="none">
+  <!-- EDIT ME: replace this src with your own audio file path or link -->
+  <source src="audio/ishq_mubarak.mp3" type="audio/mpeg" />
+</audio>
+
+<!-- ============================================================
+     HERO SECTION
+     ============================================================ -->
+<section class="hero" id="hero">
+  <div class="hero-glow"></div>
+  <span class="hero-kicker">A small journey, just for you (Janmdin Mubarak ho ( Aur Ishq bhi 😊))</span>
+  <h1 class="hero-title">Happy Birthday<br /><em>Aparna</em></h1>
+  <!-- EDIT ME: hero subtitle — a one-line note that sets the tone -->
+  <p class="hero-sub"> You once asked me kabhi birthday card banaya hai , I said yes , but haa ek bday website pehli baar hai 😅</p>
+  <div class="hero-cta">
+    <button class="btn-primary" onclick="document.getElementById('timeline').scrollIntoView({behavior:'smooth'})">Begin the journey</button>
+    <div class="scroll-cue"><span>scroll</span><span class="line"></span></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     TIMELINE SECTION
+     EDIT ME — YOUR TIMELINE:
+     Each .timeline-item below is one milestone. Change the date,
+     heading, and text. Add or remove items freely — the dotted
+     line and dot will adjust automatically.
+     ============================================================ -->
+<section class="section-pad" id="timeline">
+  <div class="wrap">
+    <span class="eyebrow reveal">Our story so far</span>
+    <h2 class="section-title reveal">Every chapter that led to today</h2>
+    <p class="section-sub reveal">A few moments I keep replaying — and a few more we haven't lived yet.</p>
+
+    <div class="timeline">
+
+      <div class="timeline-item reveal">
+        <div class="timeline-dot"></div>
+        <!-- EDIT ME -->
+        <span class="timeline-date">The Beginning</span>
+        <h3 class="timeline-heading">The day we started talking</h3>
+        <p class="timeline-text">I don't exactly remember the day when we talked or chatted for the very first time (kitna inconsiderate hu me 🫠) , but haan from the very first day (I am talking about the time when you were in 9th and I was in 12th) , I found you very friendly , approachable and " easy to talk to " kind of person , jiske saath baat karne ki actually me ichha hoti ho . That's why I never allowed our friendship to close forever , toh me beech beech me text kar deta tha 😅 , and I am very glad that we kept talkingg</p>
+      </div>
+
+      <div class="timeline-item reveal">
+        <div class="timeline-dot"></div>
+        <!-- EDIT ME -->
+        <span class="timeline-date">First Spark</span>
+        <h3 class="timeline-heading">When I knew you were the one </h3>
+        <p class="timeline-text">You know , it was not like a specific day , or a specific chat , or a specific moment jab mujhee hit huaa ho ki yaarr I likee herr 😫... Rather it was like a series of converstations with you , which made me realizee that okayy , I am starting to genuinely like her and her thoughtss and mindsett .And till this day, I can't find a single reason to not like youu or rather not "lovee you" 🫂.</p>
+      </div>
+
+      <div class="timeline-item reveal">
+        <div class="timeline-dot"></div>
+        <!-- EDIT ME -->
+        <span class="timeline-date">Us, Officially</span>
+        <h3 class="timeline-heading">The day it became "us"</h3>
+        <p class="timeline-text">So aisee official vofficial to kyaa but haa when you said that youu love me too on that day 6th June 2026 and that tooo on a call , so yeah uske baad se I guess we can calll itt "official" 😌 . And I really wishhh ki yee documents ke hisaaab se bhi official ho jaaye ek dinnn (You knoww marriage😋)</p>
+      </div>
+
+      <div class="timeline-item reveal">
+        <div class="timeline-dot"></div>
+        <!-- EDIT ME -->
+        <span class="timeline-date">A Favorite Memory</span>
+        <h3 class="timeline-heading">A day I never want to forget</h3>
+        <p class="timeline-text">Although abhi aagee bohottt saaaree aisee din aayenge jo ki unforgettable honge , aur sach kahu toh every moment with you now feelss likee unforgettable , but yesss every call that we did till now is memorable for me , especially vo vaala jis din subah ki 4:30 baj gayyii thi 😂 </p>
+      </div>
+
+      <div class="timeline-item reveal">
+        <div class="timeline-dot"></div>
+        <!-- EDIT ME -->
+        <span class="timeline-date">Today</span>
+        <h3 class="timeline-heading">Where we are now</h3>
+        <p class="timeline-text">Yes so abhi filhaal hum dono just friends vaali stage se kaafi aage pohoch gayee thankfully , and now we love each other which keeps growing every single day . We are in a mature relationship and doinggg good , just 1000 kilometers apartt 😭😭</p>
+      </div>
+
+      <div class="timeline-item reveal">
+        <div class="timeline-dot"></div>
+        <!-- EDIT ME -->
+        <span class="timeline-date">What's Next</span>
+        <h3 class="timeline-heading">Everything still ahead of us</h3>
+        <p class="timeline-text">Sabse pehle toh mujhee milnaaa haii bohot zorrrr seee and also just spend a wholee day(at least) with youu and only youu (just both of us) and haaa I hope this love keeps growing and remains pureee 💗, really want to spend the rest of my life with you only now .</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     GALLERY SECTION
+     EDIT ME — YOUR PHOTOS:
+     Each .photo-card below currently shows a placeholder heart icon.
+     To add a real photo, replace the <div class="photo-placeholder">...</div>
+     contents with: <img src="photos/your-photo.jpg" alt="description">
+     Captions are in the .photo-caption divs — edit the text directly.
+     ============================================================ -->
+<section class="section-pad" id="gallery">
+  <div class="wrap">
+    <span class="eyebrow reveal">A few favorites</span>
+    <h2 class="section-title reveal">Moments I keep coming back to</h2>
+    <p class="section-sub reveal">Tap any photo for a closer look.</p>
+
+    <div class="gallery-grid reveal">
+
+      <div class="photo-card" data-caption="My favorite pic of yours">
+        <div class="photo-placeholder">
+          <!-- EDIT ME: replace with <img src="photos/photo1.jpg" alt=""> -->
+												<img src="images/favpic.jpg.jpeg">
+        </div>
+        <div class="photo-caption">My favorite pic of yours</div>
+      </div>
+
+      <div class="photo-card" data-caption="Yourr cute childhood">
+        <div class="photo-placeholder">
+          <!-- EDIT ME: replace with <img src="photos/photo2.jpg" alt=""> -->
+												<img src="images/cute_child.jpg.jpeg">
+        </div>
+        <div class="photo-caption">Yourr Cute Childhood</div>
+      </div>
+
+      <div class="photo-card" data-caption="The smile I'll never get tired of">
+        <div class="photo-placeholder">
+          <!-- EDIT ME: replace with <img src="photos/photo3.jpg" alt=""> -->
+											<img src="images/smile.jpg.jpeg">
+        </div>
+        <div class="photo-caption">The smile I'll never get tired of</div>
+      </div>
+
+      <div class="photo-card" data-caption="A pout I kiss everyday">
+        <div class="photo-placeholder">
+          <!-- EDIT ME: replace with <img src="photos/photo4.jpg" alt=""> -->
+												<img src="images/pout.jpg.jpeg">
+        </div>
+        <div class="photo-caption">A pout I kiss everyday </div>
+      </div>
+
+      <div class="photo-card" data-caption="The stare I wish was on me">
+        <div class="photo-placeholder">
+          <!-- EDIT ME: replace with <img src="photos/photo5.jpg" alt=""> -->
+												<img src="images/stare.jpg.jpeg">
+        </div>
+        <div class="photo-caption">The stare I wish was on me</div>
+      </div>
+
+      <div class="photo-card" data-caption="My favorite kind of ordinary day">
+        <div class="photo-placeholder">
+          <!-- EDIT ME: replace with <img src="photos/photo6.jpg" alt=""> -->
+												<img src="images/ordinary_day.jpg.jpeg">
+        </div>
+        <div class="photo-caption">My favorite kind of ordinary day</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     UNLOCK SECTION — questions gate the love letter
+     EDIT ME — YOUR QUESTIONS:
+     The actual question TEXT shown to her lives here in the HTML.
+     The matching ANSWERS live in the JavaScript CONFIG section
+     near the bottom of this file (clearly marked with ★ stars).
+     The number of <div class="question-block"> here must match the
+     number of entries in the JS config, in the same order.
+     ============================================================ -->
+<section class="section-pad" id="unlock">
+  <div class="wrap">
+    <span class="eyebrow reveal">One last step</span>
+    <h2 class="section-title reveal">Answer these, love</h2>
+    <p class="section-sub reveal">Get every answer right, and a 'letter just for you' unlocks below.</p>
+
+    <div class="lock-card reveal">
+      <form id="unlock-form">
+
+        <!-- Question 1 — EDIT the text in the <p>, keep data-q="0" matching JS config index -->
+        <div class="question-block">
+          <p class="question-label"><span class="question-number">01</span>When was the last time I sent you a picture of myself? (Answer in DD-MM-YYYY format)</p>
+          <input type="text" class="answer-input" data-q="0" placeholder="Your answer.. (DD-MM-YYYY) don't forget the dashes" autocomplete="off" />
+          <div class="unlock-feedback"></div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="question-block">
+          <p class="question-label"><span class="question-number">02</span>What's my nicknamee at home?</p>
+          <input type="text" class="answer-input" data-q="1" placeholder="Your answer..." autocomplete="off" />
+          <div class="unlock-feedback"></div>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="question-block">
+          <p class="question-label"><span class="question-number">03</span>What's your MHCET Percentile upto 7 decimal pointss ?</p>
+          <input type="text" class="answer-input" data-q="2" placeholder="Just to make you smile again 😆" autocomplete="off" />
+          <div class="unlock-feedback"></div>
+										<!-- 99.7018288 -->
+        </div>
+
+        <button type="submit" class="unlock-btn" id="unlock-submit">Unlock my letter</button>
+      </form>
+      <p class="unlock-status" id="unlock-status"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     LOVE LETTER SECTION (hidden until unlocked)
+     EDIT ME — YOUR LETTER:
+     Replace the paragraphs inside #letter-body with your own words.
+     Replace "Yours, always" and "Divyansh" with your closing line.
+     ============================================================ -->
+<section class="section-pad" id="letter-section">
+  <div class="wrap">
+
+    <div class="letter-locked" id="letter-locked">
+      <div class="letter-locked-icon">🔒</div>
+      <p class="letter-locked-text">Your letter is waiting just above — answer the questions to read it.</p>
+    </div>
+
+    <div class="letter-reveal" id="letter-reveal">
+      <div class="letter-paper">
+        <p class="letter-greeting">My Aparna,</p>
+        <div class="letter-body" id="letter-body">
+          <!-- EDIT ME — write your real letter here, one thought per <p> -->
+          <p>If you're reading this, it means you got every answer right — of course you did. Haa I know bohot easy questions thee , but the intention was not to defeat you or challenge you , but just to make you smile harderr 😋</p>
+          <p>Now , you must be thinking ki yaar kya itna saaara padhna pad rahaa hai text hi text, yess I'm sorry but kyaa karu you only said ki you like reading stufff 👀 (ALTHOUGH this is not as interestinggg as the things you read but yeah still ) , aur haa video calll toh karti ho nahi toh fir isi se kaam chalaa lo 😏</p>
+          <p>Toh aparna , first of allll a verryyyy happpyyy birthdayyyy too youuu 💗🫂🫂. I am grateful that you came into this worldd and even after that out of 8 billion people on this planet you chose to love me 😅, soo I want to thank you so muchh for that as welll .</p>
+											<p>
+						        Now let this letter be about youu only and not aboutt us , because already I have made this website look like some dating stuff rather than a birthday wish 😂 but theeek hai . 
+											So yess , I wanted to congratulatee you from the bottom of my heartt for your absolute stupendous achievement in the CET exam and I really hope you get your preferred college and even if you don't , I am very proud of youu both ways because you did what you could and now its the time to just relax a bitt .
+										</p>
+										<p>Well ddo you knoww sometimes I wonder ki ek insaan me itne talents kaise ho sakte hai ?? 
+											You study well , you dance well, you can love well, you are a very good friend , I don't know about your cooking skills yet (your fault) , but haa I know you rock in that as well , Sundartaaa 😭, Ambitious , Disciplined , You can cure depression as well , You can just do everything which I want in my lifee , and yess if you be with me , then I am blessseddd 🫂💗
+										</p>
+										<p>
+											You are also a pretty shy jab mujhse baat karti ho although abhi bohot kam ho gayi hai vo shyness but still it's there . I like that as well as it makes me more desparate to knoww you and read yourr mind while you speak nothing 😆(But please mujhe zyada test mat kiya karo uspee and be as open as you can with me )
+										</p>
+										<p>
+											Baaki toh kya hi likhuuu , just be yourself , enjoy your dayy with your bestieee and misss mee moree !
+										</p>
+          <p>Once again a very Happy birthday. I hope this year gives you everything you deserve, and I hope I get to witness all of itt .</p>
+        </div>
+        <p class="letter-signature">Yours, always — Divyansh</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     CLOSING SECTION
+     ============================================================ -->
+<section class="closing">
+  <div class="closing-heart">♡</div>
+  <!-- EDIT ME: closing line -->
+  <p class="closing-text">Happy Birthday, my love. Here's to every year after this one.</p>
+  <p class="closing-sub">made with love by Divyansh, for Aparna 💗</p>
+</section>
+
+<!-- ============================================================
+     LIGHTBOX (photo zoom on click)
+     ============================================================ -->
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-content">
+    <div class="lightbox-image" id="lightbox-image">
+      <button class="lightbox-close" id="lightbox-close" aria-label="Close">✕</button>
+    </div>
+    <p class="lightbox-caption" id="lightbox-caption"></p>
+  </div>
+</div>
+
+<script>
+/* ================================================================
+   SCRIPT 1 — AMBIENT FLOATING PARTICLES
+   Soft hearts & stars drifting upward. Purely decorative, low cost.
+   ================================================================ */
+(function ambientParticles(){
+  const canvas = document.getElementById('ambient-canvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  let w, h;
+
+  function resize(){
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const SHAPES = ['heart', 'star', 'dot'];
+  const COUNT = window.innerWidth < 600 ? 22 : 38;
+
+  function makeParticle(){
+    return {
+      x: Math.random() * w,
+      y: h + Math.random() * h,
+      size: 6 + Math.random() * 12,
+      speed: 0.25 + Math.random() * 0.5,
+      drift: (Math.random() - 0.5) * 0.4,
+      opacity: 0.08 + Math.random() * 0.22,
+      shape: SHAPES[Math.floor(Math.random() * SHAPES.length)],
+      angle: Math.random() * Math.PI * 2,
+      spin: (Math.random() - 0.5) * 0.01
+    };
+  }
+
+  for (let i = 0; i < COUNT; i++) particles.push(makeParticle());
+
+  function drawHeart(p){
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.angle);
+    ctx.scale(p.size / 20, p.size / 20);
+    ctx.beginPath();
+    ctx.moveTo(0, 4);
+    ctx.bezierCurveTo(0, 0, -8, -2, -8, -7);
+    ctx.bezierCurveTo(-8, -12, 0, -12, 0, -6);
+    ctx.bezierCurveTo(0, -12, 8, -12, 8, -7);
+    ctx.bezierCurveTo(8, -2, 0, 0, 0, 4);
+    ctx.closePath();
+    ctx.fillStyle = `rgba(232,169,176,${p.opacity})`;
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawStar(p){
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.angle);
+    ctx.beginPath();
+    for (let i = 0; i < 5; i++){
+      ctx.lineTo(Math.cos((18 + i*72)*Math.PI/180) * p.size/2, -Math.sin((18 + i*72)*Math.PI/180) * p.size/2);
+      ctx.lineTo(Math.cos((54 + i*72)*Math.PI/180) * p.size/4, -Math.sin((54 + i*72)*Math.PI/180) * p.size/4);
+    }
+    ctx.closePath();
+    ctx.fillStyle = `rgba(227,192,138,${p.opacity})`;
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawDot(p){
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size/6, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(247,241,232,${p.opacity * 0.8})`;
+    ctx.fill();
+  }
+
+  function tick(){
+    ctx.clearRect(0, 0, w, h);
+    particles.forEach(p => {
+      p.y -= p.speed;
+      p.x += p.drift;
+      p.angle += p.spin;
+      if (p.y < -30){
+        Object.assign(p, makeParticle());
+        p.y = h + 20;
+      }
+      if (p.shape === 'heart') drawHeart(p);
+      else if (p.shape === 'star') drawStar(p);
+      else drawDot(p);
+    });
+    requestAnimationFrame(tick);
+  }
+
+  // Respect reduced motion: render a single static frame instead of animating
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReduced){
+    particles.forEach(p => {
+      if (p.shape === 'heart') drawHeart(p);
+      else if (p.shape === 'star') drawStar(p);
+      else drawDot(p);
+    });
+  } else {
+    tick();
+  }
+})();
+
+/* ================================================================
+   SCRIPT 2 — SCROLL REVEAL ANIMATIONS
+   Adds .in-view to any .reveal element once it enters the viewport.
+   ================================================================ */
+(function scrollReveal(){
+  const items = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting){
+        entry.target.classList.add('in-view');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  items.forEach(item => observer.observe(item));
+})();
+
+/* ================================================================
+   SCRIPT 3 — MUSIC PLAYER
+   Handles play/pause, volume, and the "tap to play" hint
+   (browsers block autoplay with sound, so we wait for a tap).
+   ================================================================ */
+(function musicPlayer(){
+  const audio = document.getElementById('bg-music');
+  const toggle = document.getElementById('music-toggle');
+  const icon = document.getElementById('music-icon');
+  const volumeSlider = document.getElementById('volume-slider');
+  const hint = document.getElementById('music-hint');
+  const player = document.getElementById('music-player');
+
+  audio.volume = parseFloat(volumeSlider.value);
+
+  // Show the "tap to play" hint briefly on load
+  setTimeout(() => hint.classList.add('visible'), 1200);
+  setTimeout(() => hint.classList.remove('visible'), 6000);
+
+  let isPlaying = false;
+
+  function setPlayingState(playing){
+    isPlaying = playing;
+    icon.textContent = playing ? '❙❙' : '♪';
+    toggle.classList.toggle('is-playing', playing);
+    toggle.setAttribute('aria-label', playing ? 'Pause music' : 'Play music');
+    player.classList.remove('is-collapsed');
+  }
+
+  toggle.addEventListener('click', () => {
+    hint.classList.remove('visible');
+    if (isPlaying){
+      audio.pause();
+      setPlayingState(false);
+    } else {
+      audio.play().then(() => setPlayingState(true)).catch(() => {
+        // If the placeholder audio file doesn't exist yet, fail quietly.
+        console.info('Add your music file to enable playback — see the README section.');
+      });
+    }
+  });
+
+  volumeSlider.addEventListener('input', (e) => {
+    audio.volume = parseFloat(e.target.value);
+  });
+})();
+
+/* ================================================================
+   SCRIPT 4 — UNLOCK QUESTIONS & LOVE LETTER REVEAL
+
+   ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+   ★                                                              ★
+   ★   CONFIG SECTION — ADD YOUR QUESTIONS & ANSWERS HERE         ★
+   ★                                                              ★
+   ★   This array holds the CORRECT ANSWERS, in the same order   ★
+   ★   as the questions you wrote in the HTML above (data-q="0", ★
+   ★   data-q="1", data-q="2"...).                                ★
+   ★                                                              ★
+   ★   - Add as many entries as you have questions.              ★
+   ★   - Each entry can have MULTIPLE acceptable answers —        ★
+   ★     just add more strings to that question's array.          ★
+   ★   - Matching is automatically case-insensitive and ignores   ★
+   ★     extra spaces, so "Goa", " goa ", and "GOA" all match.    ★
+   ★                                                              ★
+   ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+   */
+  const UNLOCK_ANSWERS = [
+    // Question 1 (data-q="0"): Where did we go on our first date?
+    ["12-06-2026", "12-JUNE-2026"],
+
+    // Question 2 (data-q="1"): What's the nickname only I call you?
+    ["dikku"],
+
+    // Question 3 (data-q="2"): What song reminds us of each other?
+    ["99.7018288"],
+  ];
+  /* ★★★★★★★★★★★★★★★★★★★ END OF CONFIG SECTION ★★★★★★★★★★★★★★★★★ */
+
+(function unlockLogic(){
+  const form = document.getElementById('unlock-form');
+  const inputs = Array.from(document.querySelectorAll('.answer-input'));
+  const status = document.getElementById('unlock-status');
+  const lockedView = document.getElementById('letter-locked');
+  const revealView = document.getElementById('letter-reveal');
+
+  function normalize(str){
+    return str.trim().toLowerCase().replace(/\s+/g, ' ');
+  }
+
+  function checkAnswer(input){
+    const qIndex = parseInt(input.dataset.q, 10);
+    const acceptable = UNLOCK_ANSWERS[qIndex] || [];
+    const given = normalize(input.value);
+    if (!given) return null; // empty, not yet attempted
+    return acceptable.some(ans => normalize(ans) === given);
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    let allCorrect = true;
+
+    inputs.forEach(input => {
+      const feedback = input.closest('.question-block').querySelector('.unlock-feedback');
+      const result = checkAnswer(input);
+
+      if (result === true){
+        input.classList.remove('incorrect');
+        input.classList.add('correct');
+        feedback.textContent = '';
+        feedback.className = 'unlock-feedback success';
+      } else {
+        input.classList.remove('correct');
+        input.classList.add('incorrect');
+        feedback.textContent = 'Fir se try karoo';
+        feedback.className = 'unlock-feedback error';
+        allCorrect = false;
+        setTimeout(() => input.classList.remove('incorrect'), 500);
+      }
+    });
+
+    if (allCorrect){
+      status.textContent = '';
+      lockedView.style.display = 'none';
+      revealView.classList.add('visible');
+      setTimeout(() => {
+        revealView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 200);
+    } else {
+      status.textContent = 'A few of these need another look. Take your time.';
+    }
+  });
+})();
+
+/* ================================================================
+   SCRIPT 5 — GALLERY LIGHTBOX
+   Tapping a photo opens a larger preview with its caption.
+   ================================================================ */
+(function lightbox(){
+  const cards = document.querySelectorAll('.photo-card');
+  const box = document.getElementById('lightbox');
+  const boxImage = document.getElementById('lightbox-image');
+  const boxCaption = document.getElementById('lightbox-caption');
+  const closeBtn = document.getElementById('lightbox-close');
+
+  cards.forEach(card => {
+    card.addEventListener('click', () => {
+      const caption = card.dataset.caption || '';
+      const innerImg = card.querySelector('.photo-placeholder img, img');
+      // Clear previous content but keep the close button
+      boxImage.innerHTML = '';
+      boxImage.appendChild(closeBtn);
+      if (innerImg){
+        const cloned = innerImg.cloneNode(true);
+        boxImage.appendChild(cloned);
+      }
+      boxCaption.textContent = caption;
+      box.classList.add('visible');
+    });
+  });
+
+  function close(){ box.classList.remove('visible'); }
+  closeBtn.addEventListener('click', close);
+  box.addEventListener('click', (e) => { if (e.target === box) close(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+})();
+</script>
+
+</body>
+</html>
